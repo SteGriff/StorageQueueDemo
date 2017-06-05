@@ -19,7 +19,7 @@ namespace StorageQueueDemo.Sender
             var queueProvider = new QueueProvider(connectionString);
             var r = new Random();
             int i = 0;
-            string shard = System.Environment.MachineName + DateTime.Now.ToString("HHmm");
+            string shard = GetShardName(r);
 
             Console.WriteLine("Get StorageQueue...");
             var textFileQ = queueProvider.GetQueue("textqueue");
@@ -38,6 +38,11 @@ namespace StorageQueueDemo.Sender
                 Console.WriteLine("Added message " + i);
                 System.Threading.Thread.Sleep(r.Next(0, 1000));
             }
+        }
+
+        private static string GetShardName(Random r)
+        {
+            return Environment.MachineName + DateTime.Now.ToString("HHmmss") + r.Next(111, 999);
         }
 
         static string GenerateContent(int i, Random r, string shard)
