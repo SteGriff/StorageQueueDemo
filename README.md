@@ -8,11 +8,11 @@ This program fires up two processes:
 
 The sender console app generates trivial text messages that look like this:
 
- > LYCHEN1041-63
- > Time and date: Mon Jun 2017 ... 10:41
- > Message:surveillanceeventually
- > End!
- 
+ > LYCHEN1041-63  
+ > Time and date: Mon Jun 2017 ... 10:41  
+ > Message:surveillanceeventually  
+ > End!  
+
 (The message is two random words from a large corpus)
 
 These messages are submitted to a StorageQueue. The program then takes a random-length rest for up to a second.
