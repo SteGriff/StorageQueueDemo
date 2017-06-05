@@ -1,4 +1,5 @@
-﻿using StorageQueueDemo;
+﻿using Microsoft.WindowsAzure.Storage.Queue;
+using StorageQueueDemo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,27 +12,43 @@ namespace StorageQueueDemo.Sender
     {
         static void Main(string[] args)
         {
-            string connectionString = "DefaultEndpointsProtocol=https;AccountName=tb20532;AccountKey=/A8VR/SFJdnJ4s3od3DQWRCl6xORoSzohJJVGSH37+GLFzCODoI/WFbTazCmlT3rGOE/Yrs8jsHieOu5Q0SnwQ==;EndpointSuffix=core.windows.net";
+            Console.Title = "Sender";
+            Console.WriteLine("Get StorageAccount...");
+
+            string connectionString = "YourStorageAccountConnectionString";
             var queueProvider = new QueueProvider(connectionString);
             var r = new Random();
+            int i = 0;
+            string shard = System.Environment.MachineName + DateTime.Now.ToString("HHmm");
 
-            var textFileQ = queueProvider.GetQueue("TextFileQ");
+            Console.WriteLine("Get StorageQueue...");
+            var textFileQ = queueProvider.GetQueue("textqueue");
+
+            Console.WriteLine("OK");
+            Console.WriteLine("Populating Queue...");
 
             //Run forever until terminated with Ctrl+C
             while (true)
             {
-                string textValue = string.Format("File{0} ")
+                string textValue = GenerateContent(i, r, shard);
+                i += 1;
+                var message = new CloudQueueMessage(textValue);
+                textFileQ.AddMessage(message);
+
+                Console.WriteLine("Added message " + i);
+                System.Threading.Thread.Sleep(r.Next(0, 1000));
             }
         }
 
-        static string GenerateContent(int i, Random r)
+        static string GenerateContent(int i, Random r, string shard)
         {
-            return string.Format("File{0}{1}Time and date: {2}{1}Words of the day:{3}{4}{1}End!{1}",
+            return string.Format("{5}-{0}{1}Time and date: {2}{1}Message:{3}{4}{1}End!{1}",
                 i,
                 Environment.NewLine,
                 DateTime.Now.ToString("ddd MMM yyyy ... HH:mm"),
-                r.Next(0, words.Count - 1),
-                r.Next(0, words.Count - 1)
+                words[r.Next(0, words.Count - 1)],
+                words[r.Next(0, words.Count - 1)],
+                shard
                 );
         }
 
